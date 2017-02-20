@@ -11,15 +11,19 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.raizlabs.android.dbflow.sql.language.SQLite;
+
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     ArrayList<String> items;
+    ArrayList<Integer> ids;
     ArrayAdapter<String> itemsAdapter;
     ListView lvItems;
 
@@ -28,23 +32,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void readItems() {
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        try {
-            items = new ArrayList<>(FileUtils.readLines(todoFile));
-        } catch (IOException e) {
-            items = new ArrayList<>();
+        items = new ArrayList<>();
+        ids = new ArrayList<>();
+
+        List<TaskItem> taskItems = SQLite.select().from(TaskItem.class).queryList();
+        for(TaskItem taskItem : taskItems) {
+            items.add(taskItem.getName());
+            ids.add(taskItem.getId());
         }
     }
 
-    private void writeItems() {
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        try {
-            FileUtils.writeLines(todoFile, items);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void writeItem(String name, int id) {
+        TaskItem taskItem = new TaskItem();
+
+        taskItem.setName(name);
+        taskItem.setId(id);
+
+        taskItem.save();
+    }
+
+    private void deleteItem(int id) {
+        List<TaskItem> taskItems = SQLite.select().
+                from(TaskItem.class).
+                where(TaskItem_Table.id.eq(id)).queryList();
+
+        taskItems.get(0).delete();
     }
 
     @Override
@@ -69,10 +81,10 @@ public class MainActivity extends AppCompatActivity {
             String item = data.getExtras().getString("item");
             int position = data.getExtras().getInt("position");
 
+            writeItem(item, position);
+
             items.set(position, item);
             itemsAdapter.notifyDataSetChanged();
-
-            writeItems();
         }
     }
 
@@ -80,10 +92,11 @@ public class MainActivity extends AppCompatActivity {
         lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapter, View item, int pos, long id) {
-                items.remove(pos);
-                itemsAdapter.notifyDataSetChanged();
+                deleteItem(ids.get(pos));
 
-                writeItems();
+                items.remove(pos);
+                ids.remove(pos);
+                itemsAdapter.notifyDataSetChanged();
 
                 return true;
             }
@@ -107,10 +120,11 @@ public class MainActivity extends AppCompatActivity {
         String itemText = etNewItem.getText().toString();
         etNewItem.setText("");
 
+        writeItem(itemText, items.size());
+
+        ids.add(items.size());
         items.add(itemText);
         itemsAdapter.notifyDataSetChanged();
-
-        writeItems();
     }
 
 }
