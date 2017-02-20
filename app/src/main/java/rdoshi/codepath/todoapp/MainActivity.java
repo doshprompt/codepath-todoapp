@@ -1,5 +1,6 @@
 package rdoshi.codepath.todoapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -8,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.apache.commons.io.FileUtils;
 
@@ -21,13 +23,17 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter<String> itemsAdapter;
     ListView lvItems;
 
+    enum REQUEST_CODES {
+        EDIT_ITEM
+    }
+
     private void readItems() {
         File filesDir = getFilesDir();
         File todoFile = new File(filesDir, "todo.txt");
         try {
-            items = new ArrayList<String>(FileUtils.readLines(todoFile));
+            items = new ArrayList<>(FileUtils.readLines(todoFile));
         } catch (IOException e) {
-            items = new ArrayList<String>();
+            items = new ArrayList<>();
         }
     }
 
@@ -57,29 +63,52 @@ public class MainActivity extends AppCompatActivity {
         setupListViewListener();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODES.EDIT_ITEM.ordinal()) {
+            String item = data.getExtras().getString("item");
+            int position = data.getExtras().getInt("position");
+
+            items.set(position, item);
+            itemsAdapter.notifyDataSetChanged();
+
+            writeItems();
+        }
+    }
+
     private void setupListViewListener() {
-        lvItems.setOnItemLongClickListener(
-                new AdapterView.OnItemLongClickListener() {
+        lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-                    public boolean onItemLongClick(AdapterView<?> adapter,
-                                                   View item, int pos, long id) {
-                        items.remove(pos);
-                        itemsAdapter.notifyDataSetChanged();
+            public boolean onItemLongClick(AdapterView<?> adapter, View item, int pos, long id) {
+                items.remove(pos);
+                itemsAdapter.notifyDataSetChanged();
 
-                        writeItems();
+                writeItems();
 
-                        return true;
-                    }
+                return true;
             }
-        );
+        });
+
+        lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
+                Intent intent = new Intent(MainActivity.this, EditItemActivity.class);
+
+                intent.putExtra("item", items.get(pos));
+                intent.putExtra("position", pos);
+
+                startActivityForResult(intent, REQUEST_CODES.EDIT_ITEM.ordinal());
+            }
+        });
     }
 
     public void onAddItem(View v) {
         EditText etNewItem = (EditText) findViewById(R.id.etNewItem);
         String itemText = etNewItem.getText().toString();
-
-        itemsAdapter.add(itemText);
         etNewItem.setText("");
+
+        items.add(itemText);
+        itemsAdapter.notifyDataSetChanged();
 
         writeItems();
     }
