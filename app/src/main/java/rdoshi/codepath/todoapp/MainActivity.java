@@ -2,7 +2,10 @@ package rdoshi.codepath.todoapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
@@ -20,16 +23,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements EditItemDialogFragment.EditItemDialogListener {
 
     ArrayList<String> items;
     ArrayList<Integer> ids;
     ArrayAdapter<String> itemsAdapter;
     ListView lvItems;
-
-    enum REQUEST_CODES {
-        EDIT_ITEM
-    }
 
     private void readItems() {
         items = new ArrayList<>();
@@ -73,19 +72,38 @@ public class MainActivity extends AppCompatActivity {
         lvItems.setAdapter(itemsAdapter);
 
         setupListViewListener();
+
+        ((EditText) findViewById(R.id.etNewItem)).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                findViewById(R.id.btnAddItem).setEnabled(charSequence.length() > 0);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == REQUEST_CODES.EDIT_ITEM.ordinal()) {
-            String item = data.getExtras().getString("item");
-            int position = data.getExtras().getInt("position");
+    public void onFinishEditDialog(String name, int position) {
+        writeItem(name, position);
 
-            writeItem(item, position);
+        items.set(position, name);
+        itemsAdapter.notifyDataSetChanged();
+    }
 
-            items.set(position, item);
-            itemsAdapter.notifyDataSetChanged();
-        }
+    private void showEditDialog(String name, int position) {
+        FragmentManager fm = getSupportFragmentManager();
+        EditItemDialogFragment editItemDialogFragment = EditItemDialogFragment
+                .newInstance(name, position);
+        editItemDialogFragment.show(fm, "fragment_edit_item");
     }
 
     private void setupListViewListener() {
@@ -105,17 +123,12 @@ public class MainActivity extends AppCompatActivity {
         lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
-                Intent intent = new Intent(MainActivity.this, EditItemActivity.class);
-
-                intent.putExtra("item", items.get(pos));
-                intent.putExtra("position", pos);
-
-                startActivityForResult(intent, REQUEST_CODES.EDIT_ITEM.ordinal());
+                showEditDialog(items.get(pos), pos);
             }
         });
     }
 
-    public void onAddItem(View v) {
+    public void onAddItem(View view) {
         EditText etNewItem = (EditText) findViewById(R.id.etNewItem);
         String itemText = etNewItem.getText().toString();
         etNewItem.setText("");
