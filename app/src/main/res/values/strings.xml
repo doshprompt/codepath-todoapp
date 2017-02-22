@@ -1,3 +1,19 @@
 <resources>
-    <string name="app_name">TodoApp</string>
+    <string name="app_name">Listagram</string>
+    <string name="action_search">Search</string>
+    <string name="action_sort">Sort</string>
+    <string name="action_new">New</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
+    <string name="search_hint">Search for task items…</string>
+    <string name="task_complete">Task Item: \"%1$s\" resolved as DONE!</string>
+    <string name="no_search_results">No Results Found</string>
+    <string name="no_due_date">No Due Date</string>
+
+    <string-array name="task_priorities">
+        <item>High</item>
+        <item>Medium</item>
+        <item>Low</item>
+    </string-array>
 </resources>

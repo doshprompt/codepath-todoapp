@@ -1,61 +1,65 @@
 package rdoshi.codepath.todoapp;
 
-import android.content.Intent;
+import android.app.SearchManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements EditItemDialogFragment.EditItemDialogListener {
 
-    ArrayList<String> items;
-    ArrayList<Integer> ids;
-    ArrayAdapter<String> itemsAdapter;
+    ArrayList<TaskItem> items;
+    TaskItemAdapter itemsAdapter;
     ListView lvItems;
 
     private void readItems() {
-        items = new ArrayList<>();
-        ids = new ArrayList<>();
+        items = new ArrayList<>(SQLite.select().from(TaskItem.class).queryList());
+    }
 
-        List<TaskItem> taskItems = SQLite.select().from(TaskItem.class).queryList();
-        for(TaskItem taskItem : taskItems) {
-            items.add(taskItem.getName());
-            ids.add(taskItem.getId());
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_main_actions, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_new:
+                FragmentManager fm = getSupportFragmentManager();
+                EditItemDialogFragment editItemDialogFragment = EditItemDialogFragment
+                        .newInstance(new TaskItem(), items.size());
+                editItemDialogFragment.show(fm, "fragment_edit_item");
+                return true;
+            case R.id.action_search:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void writeItem(String name, int id) {
-        TaskItem taskItem = new TaskItem();
-
-        taskItem.setName(name);
-        taskItem.setId(id);
-
-        taskItem.save();
-    }
-
-    private void deleteItem(int id) {
-        List<TaskItem> taskItems = SQLite.select().
-                from(TaskItem.class).
-                where(TaskItem_Table.id.eq(id)).queryList();
-
-        taskItems.get(0).delete();
     }
 
     @Override
@@ -67,54 +71,37 @@ public class MainActivity extends AppCompatActivity implements EditItemDialogFra
 
         readItems();
 
-        itemsAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, items);
+        itemsAdapter = new TaskItemAdapter(this, items);
         lvItems.setAdapter(itemsAdapter);
 
         setupListViewListener();
-
-        ((EditText) findViewById(R.id.etNewItem)).addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                findViewById(R.id.btnAddItem).setEnabled(charSequence.length() > 0);
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
     }
 
     @Override
-    public void onFinishEditDialog(String name, int position) {
-        writeItem(name, position);
+    public void onFinishEditDialog(TaskItem taskItem, int position) {
+        taskItem.save();
 
-        items.set(position, name);
+        if (position != items.size()) {
+            items.set(position, taskItem);
+        } else {
+            items.add(taskItem);
+        }
+
         itemsAdapter.notifyDataSetChanged();
-    }
-
-    private void showEditDialog(String name, int position) {
-        FragmentManager fm = getSupportFragmentManager();
-        EditItemDialogFragment editItemDialogFragment = EditItemDialogFragment
-                .newInstance(name, position);
-        editItemDialogFragment.show(fm, "fragment_edit_item");
     }
 
     private void setupListViewListener() {
         lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapter, View item, int pos, long id) {
-                deleteItem(ids.get(pos));
+                TaskItem taskItem = items.get(pos);
 
                 items.remove(pos);
-                ids.remove(pos);
                 itemsAdapter.notifyDataSetChanged();
+
+                Toast.makeText(getApplicationContext(), String.format(getString(R.string.task_complete), taskItem.getName()), Toast.LENGTH_SHORT).show();
+
+                taskItem.delete();
 
                 return true;
             }
@@ -123,21 +110,12 @@ public class MainActivity extends AppCompatActivity implements EditItemDialogFra
         lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
-                showEditDialog(items.get(pos), pos);
+                FragmentManager fm = getSupportFragmentManager();
+                EditItemDialogFragment editItemDialogFragment = EditItemDialogFragment
+                        .newInstance(items.get(pos), pos);
+                editItemDialogFragment.show(fm, "fragment_edit_item");
             }
         });
-    }
-
-    public void onAddItem(View view) {
-        EditText etNewItem = (EditText) findViewById(R.id.etNewItem);
-        String itemText = etNewItem.getText().toString();
-        etNewItem.setText("");
-
-        writeItem(itemText, items.size());
-
-        ids.add(items.size());
-        items.add(itemText);
-        itemsAdapter.notifyDataSetChanged();
     }
 
 }

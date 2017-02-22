@@ -1,10 +1,10 @@
 # Pre-work - CodePath TodoApp
 
-**CodePath TodoApp** is an android app that allows building a todo list and basic todo items management functionality including adding new items, editing and deleting an existing item.
+**Listagram** is an android app that allows building a todo list and basic todo items management functionality including adding new items, editing and deleting an existing item.
 
 Submitted by: **Rahul Doshi**
 
-Time spent: **3** hour(s) spent in total
+Time spent: **8** hour(s) spent in total
 
 ## User Stories
 
@@ -17,15 +17,15 @@ The following **required** functionality is completed:
 The following **optional** features are implemented:
 
 * [x] Persist the todo items [into SQLite](http://guides.codepath.com/android/Persisting-Data-to-the-Device#sqlite) instead of a text file
-* [ ] Improve style of the todo items in the list [using a custom adapter](http://guides.codepath.com/android/Using-an-ArrayAdapter-with-ListView)
-* [ ] Add support for completion due dates for todo items (and display within listview item)
+* [x] Improve style of the todo items in the list [using a custom adapter](http://guides.codepath.com/android/Using-an-ArrayAdapter-with-ListView)
+* [x] Add support for completion due dates for todo items (and display within listview item)
 * [x] Use a [DialogFragment](http://guides.codepath.com/android/Using-DialogFragment) instead of new Activity for editing items
-* [ ] Add support for selecting the priority of each todo item (and display in listview item)
-* [ ] Tweak the style improving the UI / UX, play with colors, images or backgrounds
+* [x] Add support for selecting the priority of each todo item (and display in listview item)
+* [x] Tweak the style improving the UI / UX, play with colors, images or backgrounds
 
 The following **additional** features are implemented:
 
-* [ ] List anything else that you can get done to improve the app functionality!
+* [x] User can search for task items by keywords in the name
 
 ## Video Walkthrough 
 
@@ -37,7 +37,16 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ## Notes
 
-Describe any challenges encountered while building the app.
+I planned on completing a whole number of other design ideas that I have but I had no time/ran short:
+
+* Use material design's floating action button style to allow for creation of new task items (promoted action)
+* Tabbed activity view to separate/segragate items either by priority, due date or completed/incomplete/archived
+* Tindr-like take on ToDos with a swipeable UX for done/not-done items (aka Listr)
+* Connect to some simple backend server (like Firebase) to persist a user's todo tak items across multiple devices (with a unique ID such as a set of login credentials)
+
+DBFlow was also slightly funky to work with, especially when changing the type for a column the app needed to be recompiled before it would pick up the changes when writing out the syntax for SQL queries etc.
+
+Lastly, getting the right icons was a challenge, and layouts were not always easy to work with.
 
 ## License
 
