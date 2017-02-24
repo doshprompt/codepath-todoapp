@@ -21,6 +21,8 @@ import android.widget.Toast;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -30,9 +32,28 @@ public class MainActivity extends AppCompatActivity implements EditItemDialogFra
     TaskItemAdapter itemsAdapter;
     ListView lvItems;
 
-    private void readItems() {
-        items = new ArrayList<>(SQLite.select().from(TaskItem.class).queryList());
-    }
+    boolean sortOrder;
+    Comparator sortComparator;
+
+    Comparator<TaskItem> dueDateComparator = new Comparator<TaskItem>() {
+        @Override
+        public int compare(TaskItem t1, TaskItem t2) {
+            if (t1.getDueDate() != null && t2.getDueDate() != null) {
+                return t1.getDueDate().compareTo(t2.getDueDate());
+            } else if (t1.getDueDate() == null) {
+                return 1;
+            } else {
+                return -1;
+            }
+        }
+    };
+
+    Comparator<TaskItem> priorityComparator = new Comparator<TaskItem>() {
+        @Override
+        public int compare(TaskItem t1, TaskItem t2) {
+            return t1.getPriority() - t2.getPriority();
+        }
+    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -57,6 +78,24 @@ public class MainActivity extends AppCompatActivity implements EditItemDialogFra
                 return true;
             case R.id.action_search:
                 return true;
+            case R.id.action_sort_due_date:
+                if (sortComparator != null && sortComparator.equals(dueDateComparator)) {
+                    sortOrder = !sortOrder;
+                } else {
+                    sortComparator = dueDateComparator;
+                    sortOrder = true;
+                }
+                sort();
+                return true;
+            case R.id.action_sort_priority:
+                if (sortComparator != null && sortComparator.equals(priorityComparator)) {
+                    sortOrder = !sortOrder;
+                } else {
+                    sortComparator = priorityComparator;
+                    sortOrder = true;
+                }
+                sort();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -69,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements EditItemDialogFra
 
         lvItems = (ListView) findViewById(R.id.lvItems);
 
-        readItems();
+        items = new ArrayList<>(SQLite.select().from(TaskItem.class).queryList());
 
         itemsAdapter = new TaskItemAdapter(this, items);
         lvItems.setAdapter(itemsAdapter);
@@ -116,6 +155,15 @@ public class MainActivity extends AppCompatActivity implements EditItemDialogFra
                 editItemDialogFragment.show(fm, "fragment_edit_item");
             }
         });
+    }
+
+    private void sort() {
+        Collections.sort(items, sortComparator);
+        if (!sortOrder) {
+            Collections.reverse(items);
+        }
+
+        itemsAdapter.notifyDataSetChanged();
     }
 
 }

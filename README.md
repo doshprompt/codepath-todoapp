@@ -26,6 +26,7 @@ The following **optional** features are implemented:
 The following **additional** features are implemented:
 
 * [x] User can search for task items by keywords in the name
+* [x] User can sort task items by due date, priority
 
 ## Video Walkthrough 
 

@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/action_search"
-        android:icon="@android:drawable/ic_menu_search"
+        android:icon="@mipmap/ic_magnify"
         android:title="@string/action_search"
         app:showAsAction="always"
         app:actionViewClass="android.support.v7.widget.SearchView" />
@@ -11,4 +11,15 @@
         android:icon="@mipmap/ic_note_plus"
         android:title="@string/action_new"
         app:showAsAction="always" />
+    <item android:id="@+id/action_sort"
+        android:icon="@mipmap/ic_sort"
+        android:title="@string/action_sort"
+        app:showAsAction="ifRoom">
+        <menu>
+            <item android:id="@+id/action_sort_priority"
+                android:title="@string/action_sort_priority"/>
+            <item android:id="@+id/action_sort_due_date"
+                android:title="@string/action_sort_due_date"/>
+        </menu>
+    </item>
 </menu>
