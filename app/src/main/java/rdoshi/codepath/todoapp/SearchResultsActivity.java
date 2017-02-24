@@ -46,7 +46,7 @@ public class SearchResultsActivity extends AppCompatActivity {
             items = new ArrayList<>(SQLite
                     .select()
                     .from(TaskItem.class)
-                    .where(TaskItem_Table.name.like(query))
+                    .where(TaskItem_Table.name.like("%" + query + "%"))
                     .queryList());
             itemsAdapter = new TaskItemAdapter(this, items);
             lvItems.setAdapter(itemsAdapter);
