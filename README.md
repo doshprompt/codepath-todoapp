@@ -44,9 +44,13 @@ I planned on completing a whole number of other design ideas that I have but I h
 * Tindr-like take on ToDos with a swipeable UX for done/not-done items (aka Listr)
 * Connect to some simple backend server (like Firebase) to persist a user's todo tak items across multiple devices (with a unique ID such as a set of login credentials)
 
-DBFlow was also slightly funky to work with, especially when changing the type for a column the app needed to be recompiled before it would pick up the changes when writing out the syntax for SQL queries etc.
+DBFlow was also slightly tricky to work with, especially when changing the type for a column the app needed to be recompiled before it would pick up the changes (for autocomplete) when writing out the syntax for SQL queries etc.
+
+Given more time, I would have probably also restructured/refactored my app into a few different packages, and identified several places where I could have easily promoted code reusability using modern OOP concepts and design patterns like abstraction, data encapsulation and polymorphism.
 
 Lastly, getting the right icons was a challenge, and layouts were not always easy to work with.
+
+Finally, I would have also liked to include at least some rudimentary/basic testing.
 
 ## License
 
