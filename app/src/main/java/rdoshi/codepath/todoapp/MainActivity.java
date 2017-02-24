@@ -38,13 +38,13 @@ public class MainActivity extends AppCompatActivity implements EditItemDialogFra
     Comparator<TaskItem> dueDateComparator = new Comparator<TaskItem>() {
         @Override
         public int compare(TaskItem t1, TaskItem t2) {
-            if (t1.getDueDate() != null && t2.getDueDate() != null) {
-                return t1.getDueDate().compareTo(t2.getDueDate());
-            } else if (t1.getDueDate() == null) {
-                return 1;
-            } else {
-                return -1;
+            if (t1.getDueDate() == null) {
+                return (t2.getDueDate() == null) ? 0 : -1;
             }
+            if (t2.getDueDate() == null) {
+                return 1;
+            }
+            return t2.getDueDate().compareTo(t1.getDueDate());
         }
     };
 
