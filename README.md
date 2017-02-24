@@ -54,7 +54,7 @@ Given more time, I would have probably also restructured/refactored my app into 
 
 Lastly, getting the right icons was a challenge, and layouts were not always easy to work with.
 
-Finally, I would have also liked to include at least some rudimentary/basic testing.
+Finally, I would have also liked to include at least some rudimentary/basic testing. I spent a lot of time debugging my app and manually testing edge-cases and corner conditions.
 
 ## License
 
