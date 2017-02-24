@@ -41,8 +41,9 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 I planned on completing a whole number of other design ideas that I have but I had no time/ran short:
 
 * Use material design's floating action button style to allow for creation of new task items (promoted action)
-* Use an icon (exclamation or bell) and colored vertical line to signify overdue task items
+* Use an icon (eg. exclamation or bell) and colored vertical line to signify overdue task items
 * Allow users to set optional reminders for task items in the list
+* Human readable dates (ex. Today, Tomorrow, Yesterday, This Month, Next Month, x Days from Now, n Months from Now etc.)
 * Tabbed activity view to separate/segragate items either by priority, due date or completed/incomplete/archived
 * Tindr-like take on ToDos with a swipeable UX for done/not-done items (aka Listr)
 * Connect to some simple backend server (like Firebase) to persist a user's todo tak items across multiple devices (with a unique ID such as a set of login credentials)
