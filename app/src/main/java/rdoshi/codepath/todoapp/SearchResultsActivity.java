@@ -16,7 +16,7 @@ import com.raizlabs.android.dbflow.sql.language.SQLite;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchResultsActivity extends AppCompatActivity {
+public class SearchResultsActivity extends AppCompatActivity implements EditItemDialogFragment.EditItemDialogListener {
 
     ArrayList<TaskItem> items;
     TaskItemAdapter itemsAdapter;
@@ -94,5 +94,18 @@ public class SearchResultsActivity extends AppCompatActivity {
                 editItemDialogFragment.show(fm, "fragment_edit_item");
             }
         });
+    }
+
+    @Override
+    public void onFinishEditDialog(TaskItem taskItem, int position) {
+        taskItem.save();
+
+        if (position != items.size()) {
+            items.set(position, taskItem);
+        } else {
+            items.add(taskItem);
+        }
+
+        itemsAdapter.notifyDataSetChanged();
     }
 }
