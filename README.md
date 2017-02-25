@@ -27,6 +27,7 @@ The following **additional** features are implemented:
 
 * [x] User can search for task items by keywords in the name
 * [x] User can sort task items by due date, priority
+* [x] Splash Screen while the app loads/configures itself (DBFlow) on slower devices
 
 ## Video Walkthrough 
 
